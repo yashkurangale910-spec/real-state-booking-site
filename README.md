@@ -54,7 +54,6 @@ Nestly is a premium, high-end real estate booking platform designed with a focus
 ## 📸 Screenshots
 
 ![Hero Image](./nestly-ui/public/hero.png)
-
 *(Additional images hosted in the `nestly-ui/public` directory)*
 
 ---
