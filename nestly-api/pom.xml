@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/xml-schema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>3.3.3</version>
+		<relativePath/>
+	</parent>
+	<groupId>com.nestly</groupId>
+	<artifactId>api</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>nestly-api</name>
+	<description>Premium Architecture API</description>
+	<properties>
+		<java.version>17</java.version>
+	</properties>
+	<dependencies>
+		<spring-boot-starter-web>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</spring-boot-starter-web>
+		<spring-boot-starter-data-jpa>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-jpa</artifactId>
+		</spring-boot-starter-data-jpa>
+		<h2-database>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+			<scope>runtime</scope>
+		</h2-database>
+		<spring-boot-starter-mail>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-mail</artifactId>
+		</spring-boot-starter-mail>
+		<projectlombok>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<optional>true</optional>
+		</projectlombok>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<spring-boot-maven-plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+			</spring-boot-maven-plugin>
+		</plugins>
+	</build>
+</project>
