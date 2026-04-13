@@ -1,0 +1,20 @@
+[
+  {
+    "id": 1,
+    "title": "The Obsidian Horizon",
+    "location": "Santorini, Greece",
+    "price": "€34.5M",
+    "type": "Villa",
+    "image": "/nestly_hero_architecture_1776064100314.png",
+    "description": "A poetic dialogue between monolithic concrete and the fluid vastness of the Aegean coast."
+  },
+  {
+    "id": 2,
+    "title": "Celestial Meadows",
+    "location": "Mumbai, India",
+    "price": "₹45 Cr",
+    "type": "Residential",
+    "image": "/nestly_curated_complexity_1776064134813.png",
+    "description": "A high-end residential complex designed for the elite."
+  }
+]
