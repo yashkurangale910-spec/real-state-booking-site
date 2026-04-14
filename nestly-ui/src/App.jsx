@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState, Suspense } from 'react';
 import Lenis from 'lenis';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { Mail, MapPin, Menu, Shield, Thermometer, Volume2, Share2, Heart, Download, ArrowLeft, ArrowRight, ArrowUpRight, Instagram, Linkedin, Twitter, Search, Grid, List as ListIcon, ChevronDown, X } from 'lucide-react';
+import { Mail, MapPin, Menu, Shield, Thermometer, Volume2, Share2, Heart, Download, ArrowLeft, ArrowRight, ArrowUpRight, Instagram, Linkedin, Twitter, Search, Grid, List as ListIcon, ChevronDown, X, Star, ExternalLink } from 'lucide-react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { Stars, Float, MeshDistortMaterial } from '@react-three/drei';
 
@@ -101,10 +101,65 @@ const ParallaxImage = ({ src, alt, style }) => {
 
 const App = () => {
   const [loading, setLoading] = useState(true);
-  const [view, setView] = useState('home'); 
   const [activeProperty, setActiveProperty] = useState(null);
   const [inquiryOpen, setInquiryOpen] = useState(false);
+  const [properties, setProperties] = useState([]);
+  const [reviews, setReviews] = useState([]);
+  const [newsletterEmail, setNewsletterEmail] = useState('');
+  const [inquiryData, setInquiryData] = useState({ name: '', email: '', message: '' });
   const mainRef = useRef(null);
+
+  useEffect(() => {
+    fetch('http://localhost:8080/api/properties')
+      .then(res => res.json())
+      .then(data => setProperties(data))
+      .catch(err => console.error("Error fetching properties:", err));
+  }, []);
+
+  useEffect(() => {
+    if (activeProperty) {
+      fetch(`http://localhost:8080/api/properties/${activeProperty.id}/reviews`)
+        .then(res => res.json())
+        .then(data => setReviews(data))
+        .catch(err => console.error("Error fetching reviews:", err));
+    }
+  }, [activeProperty]);
+
+  const handleNewsletterSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await fetch('http://localhost:8080/api/properties/newsletter', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: newsletterEmail })
+      });
+      if (res.ok) { alert("Subscribed to Nestly Newsletter!"); setNewsletterEmail(''); }
+    } catch (err) { console.error("Newsletter error:", err); }
+  };
+
+  const handleInquiryChange = (e) => {
+    setInquiryData({ ...inquiryData, [e.target.name]: e.target.value });
+  };
+
+  const submitInquiry = async () => {
+    try {
+      const response = await fetch('http://localhost:8080/api/properties/enquire', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...inquiryData,
+          property: activeProperty ? { id: activeProperty.id } : null
+        })
+      });
+      if (response.ok) {
+        alert("Inquiry submitted successfully!");
+        setInquiryOpen(false);
+        setInquiryData({ name: '', email: '', message: '' });
+      }
+    } catch (err) {
+      console.error("Error submitting inquiry:", err);
+    }
+  };
 
   useEffect(() => {
     if (loading) return;
@@ -127,12 +182,7 @@ const App = () => {
 
   if (loading) return <Loader onFinished={() => setLoading(false)} />;
 
-  const properties = [
-    { id: 1, title: "Aurelia Heights", location: "Worli Seaface, Mumbai", price: "₹48.5 Cr", img: "/hero.png", beds: "4", sqft: "6,200", badge1: "EXCLUSIVE", badge2: "OFF-MARKET" },
-    { id: 2, title: "The Obsidian Penthouse", location: "Golf Course Road, Gurgaon", price: "₹32.0 Cr", img: "/curated.png", beds: "5", sqft: "8,450", badge1: "FEATURED ESTATE" },
-    { id: 3, title: "Celestial Pavilion", location: "Jubilee Hills, Hyderabad", price: "₹65.0 Cr", img: "/structural.png", beds: "6", sqft: "12,000", badge1: "EXCLUSIVE" },
-    { id: 4, title: "Heritage Monolith", location: "Sadashivnagar, Bangalore", price: "₹22.5 Cr", img: "/flow.png", beds: "4", sqft: "5,800", badge1: "EXCLUSIVE PORTFOLIO" }
-  ];
+  // Properties are now fetched from backend
 
   return (
     <div ref={mainRef} style={{ cursor: 'none', background: '#080808', minHeight: '100vh', color: '#fff' }}>
@@ -144,9 +194,10 @@ const App = () => {
               <button onClick={() => setInquiryOpen(false)} style={{ position: 'absolute', top: '30px', right: '30px', color: '#fff' }}><X size={24} /></button>
               <h2 className="serif" style={{ fontSize: '32px', marginBottom: '30px' }}>Inquiry</h2>
               <form style={{ display: 'flex', flexDirection: 'column', gap: '30px' }}>
-                <input type="text" placeholder="FULL NAME" style={{ background: 'transparent', border: 'none', borderBottom: '1px solid #333', padding: '15px 0', color: '#fff', fontSize: '10px' }} />
-                <input type="email" placeholder="EMAIL ADDRESS" style={{ background: 'transparent', border: 'none', borderBottom: '1px solid #333', padding: '15px 0', color: '#fff', fontSize: '10px' }} />
-                <button className="btn-primary" style={{ background: '#c29a5b', padding: '18px' }} type="button" onClick={() => setInquiryOpen(false)}>SUBMIT INQUIRY</button>
+                <input name="name" type="text" placeholder="FULL NAME" value={inquiryData.name} onChange={handleInquiryChange} style={{ background: 'transparent', border: 'none', borderBottom: '1px solid #333', padding: '15px 0', color: '#fff', fontSize: '10px' }} />
+                <input name="email" type="email" placeholder="EMAIL ADDRESS" value={inquiryData.email} onChange={handleInquiryChange} style={{ background: 'transparent', border: 'none', borderBottom: '1px solid #333', padding: '15px 0', color: '#fff', fontSize: '10px' }} />
+                <textarea name="message" placeholder="MESSAGE (OPTIONAL)" value={inquiryData.message} onChange={handleInquiryChange} style={{ background: 'transparent', border: 'none', borderBottom: '1px solid #333', padding: '15px 0', color: '#fff', fontSize: '10px', minHeight: '80px' }} />
+                <button className="btn-primary" style={{ background: '#c29a5b', padding: '18px' }} type="button" onClick={submitInquiry}>SUBMIT INQUIRY</button>
               </form>
            </div>
         </div>
@@ -198,7 +249,7 @@ const App = () => {
             <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: '40px' }}>
               {properties.map(p => (
                 <div key={p.id} className="reveal" style={{ background: '#111', border: '1px solid #222', cursor: 'pointer' }} onClick={() => changeView('detail', p)}>
-                  <img src={p.img} alt={p.title} style={{ width: '100%', height: '350px', objectFit: 'cover' }} />
+                  <img src={p.image} alt={p.title} style={{ width: '100%', height: '350px', objectFit: 'cover' }} />
                   <div style={{ padding: '30px' }}>
                     <h3 className="serif" style={{ fontSize: '28px' }}>{p.title}</h3>
                     <p style={{ fontSize: '12px', opacity: 0.4 }}>{p.location}</p>
@@ -213,7 +264,7 @@ const App = () => {
         {view === 'detail' && activeProperty && (
           <div className="property-detail">
             <section className="hero" style={{ height: '100vh', justifyContent: 'flex-start', paddingTop: '20vh' }}>
-              <div className="hero-bg" style={{ backgroundImage: `url('${activeProperty.img}')`, backgroundSize: 'cover' }}></div>
+              <div className="hero-bg" style={{ backgroundImage: `url('${activeProperty.image}')`, backgroundSize: 'cover' }}></div>
               <div className="hero-overlay" style={{ background: 'linear-gradient(to bottom, #0d0d0d66, #0d0d0d)' }}></div>
               <div className="container" style={{ position: 'relative', zIndex: 1 }}>
                 <span style={{ border: '1px solid #c29a5b', color: '#c29a5b', fontSize: '10px', padding: '6px 18px' }}>COLLECTION 2024</span>
@@ -221,13 +272,44 @@ const App = () => {
                 <p style={{ maxWidth: '500px', opacity: 0.6, fontSize: '16px', marginTop: '20px' }}>Located at {activeProperty.location}. Designed for the ultimate luxury Monograph.</p>
                 <div style={{ display: 'flex', gap: '20px', marginTop: '50px' }}>
                    <Magnetic><button className="btn-primary" onClick={() => setInquiryOpen(true)} style={{ background: '#c29a5b' }}>BOOK VIEWING</button></Magnetic>
-                   <button onClick={() => changeView('listing')} style={{ color: '#fff', fontSize: '12px', borderBottom: '1px solid #fff' }}>BACK TO PORTFOLIO</button>
+                   {activeProperty.virtualTourUrl && (
+                     <Magnetic><button className="btn-primary" onClick={() => window.open(activeProperty.virtualTourUrl, '_blank')} style={{ background: 'transparent', border: '1px solid #c29a5b', color: '#c29a5b' }}>VIRTUAL TOUR <ExternalLink size={14} style={{ marginLeft: '10px' }} /></button></Magnetic>
+                   )}
                 </div>
+
+                <section className="reviews-section">
+                   <h2 className="serif" style={{ fontSize: '32px', marginBottom: '40px' }}>Resident Feedback</h2>
+                   {reviews.length > 0 ? (
+                     reviews.map(r => (
+                       <div key={r.id} className="review-card">
+                          <div className="rating-stars">
+                             {[...Array(r.rating)].map((_, i) => <Star key={i} size={16} fill="#c29a5b" />)}
+                          </div>
+                          <p className="review-author">{r.author}</p>
+                          <p className="review-date">{new Date(r.createdAt).toLocaleDateString()}</p>
+                          <p className="review-text">"{r.comment}"</p>
+                       </div>
+                     ))
+                   ) : (
+                     <p style={{ opacity: 0.4, fontStyle: 'italic' }}>No reviews yet for this primary estate.</p>
+                   )}
+                </section>
               </div>
             </section>
           </div>
         )}
       </main>
+
+      <section className="newsletter-section">
+         <div className="container">
+            <h2 className="serif" style={{ fontSize: '42px' }}>Curated Insights</h2>
+            <p style={{ opacity: 0.5, marginTop: '10px', fontSize: '14px' }}>Join our exclusive list for off-market previews and architectural trends.</p>
+            <form className="newsletter-form" onSubmit={handleNewsletterSubmit}>
+               <input type="email" placeholder="EMAIL ADDRESS" className="newsletter-input" value={newsletterEmail} onChange={(e) => setNewsletterEmail(e.target.value)} required />
+               <button type="submit" className="btn-primary" style={{ padding: '15px 35px' }}>SUBSCRIBE</button>
+            </form>
+         </div>
+      </section>
       <footer style={{ padding: '100px 0', background: '#000', borderTop: '1px solid #111' }}>
          <div className="container" style={{ textAlign: 'center' }}>
             <div style={{ fontSize: '10vw', fontFamily: 'var(--font-serif)', opacity: 0.1, marginBottom: '50px' }}>Nestly</div>
