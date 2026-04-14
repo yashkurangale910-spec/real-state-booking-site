@@ -25,11 +25,11 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
 		</spring-boot-starter-data-jpa>
-		<h2-database>
-			<groupId>com.h2database</groupId>
-			<artifactId>h2</artifactId>
+		<postgresql-database>
+			<groupId>org.postgresql</groupId>
+			<artifactId>postgresql</artifactId>
 			<scope>runtime</scope>
-		</h2-database>
+		</postgresql-database>
 		<spring-boot-starter-mail>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-mail</artifactId>
